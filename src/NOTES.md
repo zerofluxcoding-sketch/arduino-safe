@@ -17,3 +17,7 @@ What I have in mind
 - Make the input field hold characters that are numbers
 - Make it multitask by accepting input every 0.03 sec and display every 0.5 sec
 - When press enter \[D\] you will be able to check if your input is correct to the hard coded password
+
+## 19/10/2026 | The start of the day to this project!
+
+**17:34** — I had made a variable that has the entered password saved

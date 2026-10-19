@@ -13,17 +13,43 @@ const char KEYS[ROWS][COLS] = {
   { '*', '0', '#', 'D' }
 };
 
+const char safePassword[] = "1234";
+
+const uint8_t MAX_PIN_LENGTH = 5;
+char enteredPin[MAX_PIN_LENGTH] = {'\0'};
+uint8_t pinIndex = 0;
+
 Keypad keypad = Keypad(makeKeymap(KEYS), ROW_PINS, COL_PINS, ROWS, COLS);
+
+void displayPins();
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Initiating Program...");
 }
 
 void loop() {
   char key = keypad.getKey();
 
   if (key != NO_KEY) {
-    Serial.print(F("Key pressed: "));
+    Serial.print("Key entered: ");
     Serial.println(key);
+
+    if (key >= '0' && key <= '9') {
+      if (pinIndex < MAX_PIN_LENGTH - 1) {
+        enteredPin[pinIndex] = key;
+        enteredPin[pinIndex + 1] = '\0';
+        pinIndex++;
+      }
+
+      displayPins();
+    }
   }
+
+  delay(30);
+}
+
+void displayPins() {
+  Serial.print("Entered pin: ");
+  Serial.println(enteredPin);
 }
