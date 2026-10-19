@@ -16,12 +16,14 @@ const char KEYS[ROWS][COLS] = {
 const char safePassword[] = "1234";
 
 const uint8_t MAX_PIN_LENGTH = 5;
-char enteredPin[MAX_PIN_LENGTH] = {'\0'};
+char enteredPins[MAX_PIN_LENGTH] = {'\0'};
 uint8_t pinIndex = 0;
 
 Keypad keypad = Keypad(makeKeymap(KEYS), ROW_PINS, COL_PINS, ROWS, COLS);
 
 void displayPins();
+void deleteLastPin();
+void clearEnteredPins();
 
 void setup() {
   Serial.begin(9600);
@@ -32,17 +34,28 @@ void loop() {
   char key = keypad.getKey();
 
   if (key != NO_KEY) {
-    Serial.print("Key entered: ");
-    Serial.println(key);
-
     if (key >= '0' && key <= '9') {
       if (pinIndex < MAX_PIN_LENGTH - 1) {
-        enteredPin[pinIndex] = key;
-        enteredPin[pinIndex + 1] = '\0';
+        enteredPins[pinIndex] = key;
+        enteredPins[pinIndex + 1] = '\0';
         pinIndex++;
+        displayPins();
       }
-
-      displayPins();
+    } else if (key == 'B') {
+      clearEnteredPins();
+    } else if (key == 'A') {
+      if (pinIndex > 0) {
+        deleteLastPin();
+        displayPins();
+      }
+    } else if (key == 'D') {
+      Serial.println("----- CHECKING PASSWORD -----");
+      if (strcmp(enteredPins, safePassword)) {
+        Serial.println("ACCESS GRANTED!");
+      } else {
+        Serial.println("ACCESS DENIED!");
+      }
+      clearEnteredPins();
     }
   }
 
@@ -51,5 +64,15 @@ void loop() {
 
 void displayPins() {
   Serial.print("Entered pin: ");
-  Serial.println(enteredPin);
+  Serial.println(enteredPins);
+}
+
+void deleteLastPin() {
+  enteredPins[pinIndex - 1] = '\0';
+  pinIndex--;
+}
+
+void clearEnteredPins() {
+  pinIndex = 0;
+  enteredPins[0] = '\0';
 }

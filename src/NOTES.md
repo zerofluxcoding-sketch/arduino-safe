@@ -21,3 +21,8 @@ What I have in mind
 ## 19/10/2026 | The start of the day to this project!
 
 **17:34** — I had made a variable that has the entered password saved
+**17:49** — I added additonal functionalities such as:
+ - Deleting the last pin
+ - Clearing the entered pins
+ - Checking password
+My plan is to that I will add an OLED i2c 0.96''2 screen and added basic test display for my safe!
