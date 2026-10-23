@@ -33,9 +33,10 @@ const char KEY_DELETE = 'B';
 const char KEY_CLOSE = 'C';
 const char KEY_ENTER = 'D';
 
-void displayPins();
-void deleteLastPin();
-void clearEnteredPins();
+void printPinBuffer();
+void storeDigit(char value);
+void backspacePin();
+void resetPinBuffer();
 
 void setup() {
   Serial.begin(9600);
@@ -48,15 +49,13 @@ void loop() {
     if (currentState == LOCKED) {
       if (key >= '0' && key <= '9') {
         if (pinIndex < MAX_PIN_LENGTH - 1) {
-          enteredPins[pinIndex] = key;
-          enteredPins[pinIndex + 1] = '\0';
-          pinIndex++;
+          storeDigit(key);
         }
       } else if (key == KEY_CLEAR) {
-        clearEnteredPins();
+        resetPinBuffer();
       } else if (key == KEY_DELETE) {
         if (pinIndex > 0) {
-          deleteLastPin();
+          backspacePin();
         }
       } else if (key == KEY_ENTER) {
         Serial.println("----- CHECKING PASSWORD -----");
@@ -66,7 +65,7 @@ void loop() {
         } else {
           Serial.println("ACCESS DENIED!");
         }
-        clearEnteredPins();
+        resetPinBuffer();
       }
     } else if (currentState == UNLOCKED) {
       if (key == KEY_CLOSE)  {
@@ -74,23 +73,29 @@ void loop() {
         currentState = LOCKED;
       }
     }
-    displayPins();
+    printPinBuffer();
   }
 
   delay(30);
 }
 
-void displayPins() {
+void printPinBuffer() {
   Serial.print("Entered pin: ");
   Serial.println(enteredPins);
 }
 
-void deleteLastPin() {
+void storeDigit(char value) {
+  enteredPins[pinIndex] = value;
+  enteredPins[pinIndex + 1] = '\0';
+  pinIndex++;
+}
+
+void backspacePin() {
   enteredPins[pinIndex - 1] = '\0';
   pinIndex--;
 }
 
-void clearEnteredPins() {
+void resetPinBuffer() {
   pinIndex = 0;
   enteredPins[0] = '\0';
 }
