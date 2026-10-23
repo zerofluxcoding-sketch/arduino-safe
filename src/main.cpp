@@ -26,7 +26,12 @@ enum SAFE_STATE : uint8_t {
   UNLOCKED
 };
 
-SAFE_STATE current_state = LOCKED;
+SAFE_STATE currentState = LOCKED;
+
+const char KEY_CLEAR = 'A';
+const char KEY_DELETE = 'B';
+const char KEY_CLOSE = 'C';
+const char KEY_ENTER = 'D';
 
 void displayPins();
 void deleteLastPin();
@@ -40,37 +45,36 @@ void setup() {
 void loop() {
   char key = keypad.getKey();
   if (key != NO_KEY) {
-    if (current_state == LOCKED) {
+    if (currentState == LOCKED) {
       if (key >= '0' && key <= '9') {
         if (pinIndex < MAX_PIN_LENGTH - 1) {
           enteredPins[pinIndex] = key;
           enteredPins[pinIndex + 1] = '\0';
           pinIndex++;
-          displayPins();
         }
-      } else if (key == 'B') {
+      } else if (key == KEY_CLEAR) {
         clearEnteredPins();
-      } else if (key == 'A') {
+      } else if (key == KEY_DELETE) {
         if (pinIndex > 0) {
           deleteLastPin();
-          displayPins();
         }
-      } else if (key == 'D') {
+      } else if (key == KEY_ENTER) {
         Serial.println("----- CHECKING PASSWORD -----");
         if (strcmp(enteredPins, safePassword) == 0) {
           Serial.println("ACCESS GRANTED!");
-          current_state = UNLOCKED;
+          currentState = UNLOCKED;
         } else {
           Serial.println("ACCESS DENIED!");
         }
         clearEnteredPins();
       }
-    } else if (current_state == UNLOCKED) {
-      if (key == 'C')  {
+    } else if (currentState == UNLOCKED) {
+      if (key == KEY_CLOSE)  {
         Serial.println("CLOSING SAFE!");
-        current_state = LOCKED;
+        currentState = LOCKED;
       }
     }
+    displayPins();
   }
 
   delay(30);
