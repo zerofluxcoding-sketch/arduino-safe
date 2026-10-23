@@ -33,6 +33,9 @@ const char KEY_DELETE = 'B';
 const char KEY_CLOSE = 'C';
 const char KEY_ENTER = 'D';
 
+void handleLockedInput(char key);
+void handlePasswordChecking();
+void handleUnlockedInput(char key);
 void printPinBuffer();
 void storeDigit(char value);
 void backspacePin();
@@ -47,36 +50,55 @@ void loop() {
   char key = keypad.getKey();
   if (key != NO_KEY) {
     if (currentState == LOCKED) {
-      if (key >= '0' && key <= '9') {
-        if (pinIndex < MAX_PIN_LENGTH - 1) {
-          storeDigit(key);
-        }
-      } else if (key == KEY_CLEAR) {
-        resetPinBuffer();
-      } else if (key == KEY_DELETE) {
-        if (pinIndex > 0) {
-          backspacePin();
-        }
-      } else if (key == KEY_ENTER) {
-        Serial.println("----- CHECKING PASSWORD -----");
-        if (strcmp(enteredPins, safePassword) == 0) {
-          Serial.println("ACCESS GRANTED!");
-          currentState = UNLOCKED;
-        } else {
-          Serial.println("ACCESS DENIED!");
-        }
-        resetPinBuffer();
-      }
+      handleLockedInput(key);
     } else if (currentState == UNLOCKED) {
-      if (key == KEY_CLOSE)  {
-        Serial.println("CLOSING SAFE!");
-        currentState = LOCKED;
-      }
+      handleUnlockedInput(key);
     }
     printPinBuffer();
   }
 
   delay(30);
+}
+
+void handleLockedInput(char key) {
+  if (key >= '0' && key <= '9') {
+    if (pinIndex < MAX_PIN_LENGTH - 1) storeDigit(key);
+  } else {
+    switch (key) {
+    case KEY_CLEAR:
+      resetPinBuffer();
+      break;
+
+    case KEY_DELETE:
+      if (pinIndex > 0) backspacePin();
+      break;
+
+    case KEY_ENTER:
+      handlePasswordChecking();
+      break;
+
+    default:
+      break;
+    }
+  }
+}
+
+void handlePasswordChecking() {
+  Serial.println("----- CHECKING PASSWORD -----");
+  if (strcmp(enteredPins, safePassword) == 0) {
+    Serial.println("ACCESS GRANTED!");
+    currentState = UNLOCKED;
+  } else {
+    Serial.println("ACCESS DENIED!");
+  }
+  resetPinBuffer();
+}
+
+void handleUnlockedInput(char key) {
+  if (key == KEY_CLOSE)  {
+    Serial.println("CLOSING SAFE!");
+    currentState = LOCKED;
+  }
 }
 
 void printPinBuffer() {
